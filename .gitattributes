@@ -1,0 +1,2 @@
+# Los vectores oficiales de NIP-44 se verifican por sha256: git no debe cambiarles los fines de línea.
+tests/vectores/*.json binary
