@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="token" content="{{TOKEN}}">
+  <title>Firmante Nostr</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="cabecera">
+    <div class="franja" aria-hidden="true"></div>
+    <div class="contenedor">
+      <p class="cabecera-titulo">Firmante Nostr</p>
+      <p class="cabecera-sub">Inicia sesión con tu identidad Nostr sin entregar tu clave</p>
+    </div>
+  </header>
+
+  <main class="contenedor" id="principal">
+    <!-- Avisos globales (errores de conexión, app reiniciada, relay caído) -->
+    <div id="aviso-global" class="alerta alerta-error" role="alert" hidden>
+      <p id="aviso-global-texto"></p>
+      <button type="button" id="btn-recargar" class="boton boton-secundario" hidden>Recargar</button>
+    </div>
+
+    <p id="cargando" class="texto-secundario">Conectando con el programa local…</p>
+
+    <!-- A · Primera vez -->
+    <section id="estado-a" class="tarjeta" hidden aria-labelledby="titulo-a">
+      <h1 id="titulo-a" tabindex="-1">Configura tu identidad Nostr</h1>
+      <form id="form-crear" novalidate>
+        <fieldset>
+          <legend>¿Qué quieres hacer?</legend>
+          <label class="opcion"><input type="radio" name="modo" value="nueva" checked> Crear una clave nueva</label>
+          <label class="opcion"><input type="radio" name="modo" value="importar"> Ya tengo una clave (nsec)</label>
+        </fieldset>
+        <div id="campo-nsec" hidden>
+          <label for="nsec">Tu clave secreta (nsec)</label>
+          <input id="nsec" type="password" autocomplete="off" spellcheck="false" autocapitalize="off"
+                 placeholder="nsec1…">
+        </div>
+        <label for="contrasena1">Contraseña para proteger la clave en este computador (mínimo 8 caracteres)</label>
+        <input id="contrasena1" type="password" autocomplete="new-password" minlength="8">
+        <label for="contrasena2">Repite la contraseña</label>
+        <input id="contrasena2" type="password" autocomplete="new-password" minlength="8">
+        <div class="alerta alerta-advertencia">
+          <p>Nunca compartas tu nsec. Quien la tenga puede hacerse pasar por ti.</p>
+        </div>
+        <p id="error-a" class="error" role="alert" hidden></p>
+        <button type="submit" id="btn-crear" class="boton">Guardar y continuar</button>
+      </form>
+    </section>
+
+    <!-- A2 · Respaldo (solo si se generó la clave) -->
+    <section id="estado-a2" class="tarjeta" hidden aria-labelledby="titulo-a2">
+      <h1 id="titulo-a2" tabindex="-1">Respalda tu clave secreta</h1>
+      <div class="alerta alerta-advertencia">
+        <p>Esta es la única vez que verás tu nsec. Guárdala en un gestor de contraseñas o en papel.
+          No recargues esta página.</p>
+      </div>
+      <p class="etiqueta">Tu nsec</p>
+      <p class="codigo" id="nsec-mostrada"></p>
+      <p><button type="button" class="boton boton-secundario" data-copiar="nsec-mostrada">Copiar</button>
+        <span class="copiado" aria-live="polite"></span></p>
+      <label class="opcion"><input type="checkbox" id="respaldada"> Ya guardé mi nsec</label>
+      <button type="button" id="btn-respaldada" class="boton" disabled>Continuar</button>
+    </section>
+
+    <!-- B · Desbloquear -->
+    <section id="estado-b" class="tarjeta" hidden aria-labelledby="titulo-b">
+      <h1 id="titulo-b" tabindex="-1">Desbloquea tu firmante</h1>
+      <form id="form-desbloquear" novalidate>
+        <label for="contrasena">Contraseña</label>
+        <input id="contrasena" type="password" autocomplete="current-password">
+        <p id="error-b" class="error" role="alert" hidden></p>
+        <button type="submit" id="btn-desbloquear" class="boton">Desbloquear</button>
+      </form>
+      <p class="texto-secundario">¿Olvidaste la contraseña? No se puede recuperar. Borra <code>data/clave.json</code>
+        e importa tu nsec de nuevo.</p>
+    </section>
+
+    <!-- C · Panel listo -->
+    <section id="estado-c" hidden aria-labelledby="titulo-c">
+      <h1 id="titulo-c" tabindex="-1" class="oculto-visual">Panel del firmante</h1>
+
+      <!-- D · Tarjeta de pedido -->
+      <div id="zona-pedido" aria-live="assertive"></div>
+
+      <!-- E · Confirmación -->
+      <div id="listo" class="alerta alerta-exito" role="status" hidden>
+        <p>✓ Listo. Vuelve a la pestaña de Stacker News: ya deberías haber entrado.</p>
+      </div>
+
+      <div class="tarjeta">
+        <p id="relay-estado" class="relay"></p>
+        <div id="relay-caido" class="alerta alerta-info" hidden>
+          <p>Mientras no haya conexión, Stacker News no puede llegar a tu firmante. Espera "Conectado"
+            y vuelve a intentarlo en Stacker News.</p>
+        </div>
+        <p class="etiqueta">Tu npub (se puede compartir)</p>
+        <p class="codigo" id="npub"></p>
+        <p><button type="button" class="boton boton-secundario" data-copiar="npub">Copiar</button>
+          <span class="copiado" aria-live="polite"></span></p>
+      </div>
+
+      <ol class="pasos">
+        <li class="tarjeta">
+          <h2>Abre Stacker News</h2>
+          <p><a id="enlace-sn" href="https://stacker.news/signup?callbackUrl=https%3A%2F%2Fstacker.news%2F&amp;type=nostr"
+                target="_blank" rel="noopener noreferrer">Ir a la página de inicio de sesión de Stacker News</a></p>
+        </li>
+        <li class="tarjeta">
+          <h2>Copia este enlace y pégalo en Stacker News</h2>
+          <p>Pégalo en el campo <em>Connect with token or NIP-05 address</em>; luego pulsa
+            <em>Login with token or NIP-05</em>.</p>
+          <div id="enlace-nuevo" class="alerta alerta-info" hidden>
+            <p>Este enlace es nuevo. El anterior ya se usó. Si vuelves a iniciar sesión, copia este.</p>
+          </div>
+          <p class="codigo" id="bunker"></p>
+          <p id="bunker-espera" class="texto-secundario" hidden>El enlace aparecerá cuando haya conexión con el relay.</p>
+          <p><button type="button" id="btn-copiar-bunker" class="boton" data-copiar="bunker">Copiar enlace</button>
+            <span class="copiado" aria-live="polite"></span></p>
+        </li>
+        <li class="tarjeta">
+          <h2>Vuelve a esta pestaña y aprueba</h2>
+          <p>Si Stacker News muestra un aviso a los pocos segundos, es normal: está esperando tu aprobación.</p>
+        </li>
+      </ol>
+
+      <section class="tarjeta" aria-labelledby="titulo-historial">
+        <h2 id="titulo-historial">Historial</h2>
+        <p id="historial-vacio" class="texto-secundario">Todavía no hay actividad.</p>
+        <ul id="historial" class="historial"></ul>
+      </section>
+    </section>
+
+    <!-- Plantilla de la tarjeta de pedido (D); se clona y se llena con textContent -->
+    <template id="plantilla-pedido">
+      <section class="tarjeta tarjeta-pedido" aria-labelledby="titulo-pedido">
+        <h2 id="titulo-pedido" tabindex="-1">Pedido de inicio de sesión en
+          <span class="sitio" data-campo="sitio"></span></h2>
+        <p>Revisa que sea el sitio donde estás entrando. Si no lo reconoces, rechaza.</p>
+        <ul class="avisos" data-campo="avisos"></ul>
+        <dl class="datos">
+          <dt>Qué es</dt>
+          <dd>Un "sello" que demuestra que eres dueño de esta clave. No publica nada, no gasta dinero y no entrega
+            tu nsec.</dd>
+          <dt>Cliente</dt>
+          <dd><span data-campo="cliente"></span> · Hora: <span data-campo="hora"></span> ·
+            <span data-campo="quedan"></span></dd>
+        </dl>
+        <details>
+          <summary>Detalles técnicos</summary>
+          <p>kind <span data-campo="kind"></span> · método <span data-campo="metodo"></span> ·
+            challenge <span data-campo="challenge"></span></p>
+          <pre data-campo="json"></pre>
+        </details>
+        <p class="error" data-campo="error" role="alert" hidden></p>
+        <div class="botones">
+          <button type="button" class="boton" data-accion="aprobar">Aprobar e iniciar sesión</button>
+          <button type="button" class="boton boton-secundario" data-accion="rechazar">Rechazar</button>
+        </div>
+      </section>
+    </template>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <p>Aplicación independiente de prueba técnica. No es un sitio del Gobierno de Chile.
+        Estilo visual inspirado en el Kit Digital (kitdigital.gob.cl).</p>
+    </div>
+  </footer>
+</body>
+</html>
