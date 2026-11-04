@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+# la clave secreta del usuario NUNCA va al repo
+data/
+*.key
+.env

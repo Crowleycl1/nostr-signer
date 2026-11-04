@@ -1,0 +1,73 @@
+%%{init: {"theme":"dark","themeVariables":{"fontSize":"18px","signalTextColor":"#ffffff","signalColor":"#9fd0ff","actorBkg":"#0f69b4","actorBorder":"#9fd0ff","actorTextColor":"#ffffff","actorLineColor":"#9fd0ff","noteBkgColor":"#fcf4d4","noteTextColor":"#001c41","noteBorderColor":"#ffbf47","labelBoxBkgColor":"#0f69b4","labelBoxBorderColor":"#9fd0ff","labelTextColor":"#ffffff","loopTextColor":"#ffffff","sequenceNumberColor":"#001c41"},"sequence":{"messageFontSize":18,"actorFontSize":18,"noteFontSize":18,"wrap":true,"width":230}}}%%
+sequenceDiagram
+    autonumber
+    actor U as Usuario
+    participant P as Pagina local
+    participant F as Firmante app.py
+    participant R as Relay damus
+    participant W as Stacker News web
+    participant S as Servidor SN
+
+    Note over U,S: FASE 1 - Preparar el firmante
+    U->>F: python app.py
+    U->>P: Abre localhost 8000
+    P->>F: Abre canal de avisos SSE
+    alt Primera vez
+        U->>P: Crea clave nueva o pega su nsec, y define contraseña
+        P->>F: POST api crear
+        F->>F: Cifra la clave con scrypt y ChaCha20-Poly1305 y la guarda en data
+        F-->>P: nsec una sola vez para respaldarla, solo si se generó
+    else Ya tenía clave
+        U->>P: Escribe la contraseña
+        P->>F: POST api desbloquear
+        F->>F: Descifra la clave y la deja en memoria
+    end
+    F->>R: Se conecta y se suscribe a mensajes kind 24133 para su clave
+    R-->>F: Suscripción activa
+    F-->>P: Aviso SSE con npub y enlace bunker
+
+    Note over U,S: FASE 2 - Conectar Stacker News con el firmante
+    U->>W: Abre la página de login Nostr de SN
+    U->>P: Copia el enlace bunker
+    U->>W: Lo pega en Connect with token y pulsa Login
+    W->>S: Pide un desafío de login
+    S-->>W: challenge k1 de un solo uso
+    W->>W: NDK crea una clave de cliente temporal
+    W->>R: connect con el secret, cifrado NIP-04
+    R->>F: Reenvía
+    F->>F: Verifica firma, descifra y compara el secret
+    F->>R: ack, cifrado NIP-04
+    R->>W: Reenvía
+    F->>F: Autoriza al cliente y cambia el secret
+    F-->>P: Aviso SSE - un cliente se conectó, enlace bunker nuevo
+    W->>R: get_public_key
+    R->>F: Reenvía
+    F->>R: Clave pública, no es secreta
+    R->>W: Reenvía
+
+    Note over U,S: FASE 3 - Firmar el inicio de sesión con tu aprobación
+    W->>R: sign_event kind 27235 con challenge, sitio y método GET
+    R->>F: Reenvía
+    F->>F: Revisa que sea un login kind 27235, si no lo bloquea
+    F-->>P: Aviso SSE - pedido pendiente, expira en 2 min
+    P->>U: Tarjeta Pedido de inicio de sesión en STACKER.NEWS
+    Note over W: SN espera sin límite. A los 10 s muestra una sugerencia, es normal
+    alt Apruebas
+        U->>P: Clic en Aprobar e iniciar sesión
+        P->>F: POST api responder, aprobar
+        F->>F: Recalcula el id del evento y lo firma con Schnorr
+        F->>R: Evento firmado, cifrado NIP-04
+        R->>W: Reenvía
+        W->>S: Inicia sesión con el evento firmado
+        S->>S: Verifica la firma con tu npub y su challenge
+        S-->>W: Sesión iniciada
+        W-->>U: Ya estás dentro de Stacker News
+        F-->>P: Aviso SSE - Listo, vuelve a Stacker News
+    else Rechazas o pasan 2 minutos
+        U->>P: Clic en Rechazar o no hace nada
+        P->>F: POST api responder, rechazar
+        F->>R: error rechazado por el usuario
+        R->>W: Reenvía
+        W-->>U: SN muestra error de login
+        F-->>P: Aviso SSE - historial Rechazado
+    end

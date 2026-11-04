@@ -1,0 +1,36 @@
+flowchart TD
+    A["Llega un evento kind 24133<br/>desde el relay"] --> B{"¿Va dirigido a mi clave,<br/>id y firma válidos,<br/>no repetido?"}
+    B -- No --> X1["Se ignora en silencio"]
+    B -- Sí --> C{"¿El contenido trae '?iv='?"}
+    C -- Sí --> D1["Descifrar con NIP-04<br/>(lo que usa Stacker News hoy)"]
+    C -- No --> D2["Descifrar con NIP-44<br/>(lo que pide la spec)"]
+    D1 --> E{"¿Se pudo descifrar?"}
+    D2 --> E
+    E -- No --> X1
+    E -- Sí --> M{"¿Qué método pide?"}
+
+    M -- connect --> K{"¿El secret coincide?"}
+    K -- Sí --> K1["Responder 'ack'<br/>autorizar cliente<br/>cambiar el secret"]
+    K -- No --> XE["Responder error"]
+
+    M -- ping --> PG["Responder 'pong'"]
+
+    M -- "get_public_key / sign_event" --> AU{"¿Cliente autorizado?"}
+    AU -- No --> XE
+    AU -- "Sí, get_public_key" --> GP["Responder la clave pública"]
+    AU -- "Sí, sign_event" --> L{"¿Es un login?<br/>kind 27235 con tags u y method"}
+    L -- No --> XB["Bloqueado automáticamente<br/>(notas, perfil, zaps, etc.)<br/>se anota en el historial"]
+    L -- Sí --> T["Tarjeta en la página<br/>con el SITIO en grande"]
+    T --> Q{"¿Qué decides?<br/>(máximo 2 minutos)"}
+    Q -- Aprobar --> OK["Firmar y responder<br/>con el evento firmado"]
+    Q -- "Rechazar o expira" --> XE
+
+    M -- otro --> XE2["Responder error:<br/>método no soportado"]
+
+    K1 --> RESP["Respuesta cifrada con el<br/>mismo esquema del pedido<br/>y enviada al relay"]
+    PG --> RESP
+    GP --> RESP
+    OK --> RESP
+    XE --> RESP
+    XB --> RESP
+    XE2 --> RESP
