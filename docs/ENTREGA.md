@@ -97,29 +97,31 @@ Registros completos: docs/ai-logs/ (versión legible en sesiones/, transcripts o
 
 ## Publicar en GitHub
 
-`gh` no está instalado y este repo **sigue sin identidad de git**, a propósito: así un commit falla
-en vez de quedar firmado con el autor equivocado. Las dos líneas, cuando toque:
+Hecho el 04-11-2026. El repositorio público es
+**https://github.com/Crowleycl1/nostr-signer** (cuenta `Crowleycl1`).
+
+La identidad de git del repo quedó así, para que los commits queden atribuidos al autor sin
+exponer el Gmail:
 
     git config user.name "Felipe Álamos Núñez"
-    git config user.email "<id>+falamosnunez@users.noreply.github.com"
+    git config user.email "63745838+Crowleycl1@users.noreply.github.com"
 
 Ese alias lo muestra GitHub en *Settings → Emails* al marcar *Keep my email addresses private*:
-oculta tu Gmail y los commits siguen atribuidos a tu cuenta. El `<id>` también sale de
-`https://api.github.com/users/falamosnunez` → campo `id`.
+oculta tu Gmail y los commits siguen atribuidos a tu cuenta. El `63745838` sale de
+`https://api.github.com/users/Crowleycl1` → campo `id`. Los 7 commits anteriores, que se habían
+hecho con el Gmail, se reescribieron con `git filter-branch --env-filter` antes del primer push.
 
-1. Crear la cuenta en github.com con el usuario **falamosnunez** (está libre, verificado el 04-11-2026,
-   y es el mismo nombre de autor que usas en tus otros repos) y marcar ahí *Keep my email addresses private*.
-2. *New repository* → nombre `nostr-signer`, **Public**, sin README ni .gitignore (ya los tenemos).
-3. Después:
+1. *New repository* → nombre `nostr-signer`, **Public**, sin README ni .gitignore (ya los tenemos).
+2. Después:
 
        git add -A
        git status                       # revisa que no aparezcan data/ ni .venv/
        git commit -m "…"
        git branch -M main
-       git remote add origin https://github.com/falamosnunez/nostr-signer.git
+       git remote add origin https://github.com/Crowleycl1/nostr-signer.git
        git push -u origin main
 
-Conviene ir haciendo commits por etapa (diseño, cripto, relay/firmante, UI, entrega): el historial también muestra cómo se trabajó.
+Los commits van por etapa (diseño, cripto, relay/firmante, UI, entrega): el historial también muestra cómo se trabajó.
 
 ## Borrador del correo
 
@@ -128,7 +130,7 @@ Conviene ir haciendo commits por etapa (diseño, cripto, relay/firmante, UI, ent
 >
 > Estimados:
 >
-> Envío mi prueba técnica. Repositorio público: https://github.com/falamosnunez/nostr-signer
+> Envío mi prueba técnica. Repositorio público: https://github.com/Crowleycl1/nostr-signer
 >
 > - El README tiene las instrucciones de instalación, los supuestos, los tradeoffs y un GIF del login en
 >   Stacker News de principio a fin.
