@@ -1,2 +1,6 @@
 # Los vectores oficiales de NIP-44 se verifican por sha256: git no debe cambiarles los fines de línea.
 tests/vectores/*.json binary
+
+# El GIF de la demo y la grabacion original son binarios: git no debe tocarlos.
+docs/demo.gif binary
+evidencia/*.mp4 binary

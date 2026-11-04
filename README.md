@@ -2,6 +2,8 @@
 
 ![Demo: login en Stacker News aprobando la firma](docs/demo.gif)
 
+*Grabación completa, sin comprimir ni acelerar: [`evidencia/stacker.news_sign.mp4`](evidencia/stacker.news_sign.mp4) (41 s).*
+
 App local en Python que guarda tu clave Nostr (nsec) **cifrada** y firma por ti, **solo cuando tú lo apruebas**,
 el inicio de sesión de Stacker News. Le das a SN un enlace `bunker://`; tu clave nunca sale de tu computador.
 
