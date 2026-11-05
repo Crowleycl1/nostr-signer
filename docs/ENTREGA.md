@@ -130,14 +130,25 @@ Los commits van por etapa (diseño, cripto, relay/firmante, UI, entrega): el his
 >
 > Estimados:
 >
-> Envío mi prueba técnica. Repositorio público: https://github.com/Crowleycl1/nostr-signer
+> Envío mi prueba técnica: un firmante remoto Nostr (NIP-46) en Python que permite
+> iniciar sesión en Stacker News sin entregarle la clave privada al sitio.
 >
-> - El README tiene las instrucciones de instalación, los supuestos, los tradeoffs y un GIF del login en
->   Stacker News de principio a fin.
-> - Los registros de conversación con el agente de IA (Claude Code) están en `docs/ai-logs/`.
-> - Las decisiones de diseño están en `docs/DISENO.md`.
+> Repositorio público (en mi cuenta Crowleycl1): https://github.com/Crowleycl1/nostr-signer
+>
+> Para facilitar la revisión:
+>
+> - El flujo funcionando de principio a fin: es el GIF que abre el README; la grabación
+>   original completa está en evidencia/.
+> - Instalación, supuestos y tradeoffs: en el README.
+> - La ambigüedad principal y cómo la resolví: la sección "NIP-04 vs NIP-44" del README
+>   explica la decisión y su fundamento. Lo que dejé deliberadamente fuera de alcance
+>   está en "Qué quedó fuera".
+> - Registros de conversación con el agente de IA (Claude Code): en docs/ai-logs/, con
+>   una versión legible en sesiones/ y, en mesa-diseno/, las propuestas y revisiones
+>   cruzadas de los tres subagentes expertos con los que acoté el diseño.
+> - Decisiones de diseño: docs/DISENO.md.
 >
 > Quedo atento a cualquier consulta.
 >
-> Saludos,
+> Saludos cordiales,
 > Felipe Álamos Núñez
