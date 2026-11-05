@@ -15,7 +15,9 @@ el inicio de sesión de Stacker News. Le das a SN un enlace `bunker://`; tu clav
 ## Instalación
 
     python -m venv .venv
-    .venv\Scripts\pip install -r requirements.txt        (Linux/macOS: .venv/bin/pip)
+    .venv\Scripts\pip install -r requirements.txt
+
+En Linux/macOS, `.venv/bin/` en vez de `.venv\Scripts\` (vale para todos los comandos de aquí en adelante).
 
 Dependencias: `aiohttp`, `coincurve` y `cryptography`. No hay frameworks de frontend.
 
@@ -26,13 +28,22 @@ Dependencias: `aiohttp`, `coincurve` y `cryptography`. No hay frameworks de fron
 Variable opcional: `NOSTR_RELAY` (por defecto `wss://relay.damus.io`). Ejemplo en PowerShell:
 `$env:NOSTR_RELAY="wss://nos.lol"; .venv\Scripts\python app.py`.
 
-Pruebas (53, más subtests: cifrado con **todos** los vectores oficiales de NIP-44, almacén, firmante y servidor):
+## Verificar sin tener cuenta en Stacker News
+
+Todo el flujo se puede comprobar sin registrarse en el sitio real.
+
+Las pruebas (53, más subtests: cifrado con **todos** los vectores oficiales de NIP-44, almacén,
+firmante y servidor) corren en unos 6 segundos:
 
     .venv\Scripts\python -m unittest -v
 
-Cliente de prueba que imita a Stacker News, sin abrir el sitio (pega el enlace que muestra la app):
+Y `sn_falso.py` imita a NDK 2.12.2 —la librería con la que Stacker News hace el login— haciendo
+`connect`, `get_public_key` y pidiendo la firma de un kind 27235. Levanta `app.py`, copia el
+enlace que muestra la página y pégalo aquí:
 
-    .venv\Scripts\python herramientas\sn_falso.py "bunker://..."           (--kind 1, --secret-malo, --nip44…)
+    .venv\Scripts\python herramientas\sn_falso.py "bunker://..."
+
+Admite `--kind 1` (debe rechazarse), `--secret-malo` y `--nip44` para los casos de borde.
 
 ## Uso con Stacker News (3 pasos)
 
