@@ -132,7 +132,8 @@ nostr/eventos.py          serializar NIP-01, calcular id, firmar y verificar
 nostr/nip04.py            AES-256-CBC (lo que usa SN hoy)
 nostr/nip44.py            NIP-44 v2 (lo que exige la spec)
 static/index.html, app.css, app.js
-tests/                    unittest: bech32, eventos, nip04, nip44 (vectores oficiales), almacen
+tests/                    unittest (53): bech32, eventos, nip04, nip44 (vectores oficiales),
+                          almacen, firmante y servidor
 herramientas/sn_falso.py  cliente que IMITA a NDK (NIP-04, ["",secret], exige "ack", kind 27235, clave nueva por corrida)
 ```
 

@@ -45,6 +45,11 @@ enlace que muestra la página y pégalo aquí:
 
 Admite `--kind 1` (debe rechazarse), `--secret-malo` y `--nip44` para los casos de borde.
 
+Si vas a correrlo **varias veces seguidas**, cambia de relay: `relay.damus.io` limita la tasa por IP
+y puede bloquearte un rato (está documentado en `docs/DISENO.md`, hecho H14).
+
+    $env:NOSTR_RELAY="wss://nos.lol"; .venv\Scripts\python app.py
+
 ## Uso con Stacker News (3 pasos)
 
 1. Abre http://localhost:8000, crea una clave nueva (o importa tu nsec) y elige una contraseña.
